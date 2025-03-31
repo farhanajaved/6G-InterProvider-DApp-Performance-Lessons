@@ -3,7 +3,7 @@
 
 ## Abstract
 
-This paper presents a multi-contract blockchain framework for inter-provider agreements in 6G networks, emphasizing performance analysis under a realistic Proof-of-Stake (PoS) setting on Ethereum’s Sepolia testnet. We begin by quantifying Ethereum Virtual Machine (EVM)-based gas usage for critical operations such as provider registration, service addition, and SLA penalty enforcement, observing that cold writes and deep data structures can each inflate gas consumption by up to 20\%. We then examine block-level dynamics when multiple transactions execute concurrently, revealing that moderate concurrency (e.g., 30–50 simultaneous transactions) can fill blocks to 80–90\% of their gas limit and nearly double finalization times from around 15 seconds to over 30 seconds. Finally, we synthesize these insights into a practical design guide, demonstrating that flattening nested mappings, consolidating storage writes, and selectively timing high-impact transactions can markedly reduce costs and latency spikes. Collectively, our findings underscore the importance of EVM-specific optimizations and transaction scheduling for large-scale DApps in 6G telecom scenarios.
+This paper presents a multi-contract blockchain framework for inter-provider agreements in 6G networks, emphasizing performance analysis under a realistic Proof-of-Stake (PoS) setting on Ethereum’s Sepolia testnet. We begin by quantifying Ethereum Virtual Machine (EVM)-based gas usage for critical operations such as provider registration, service addition, and SLA penalty enforcement, observing that cold writes and deep data structures can each inflate gas consumption by up to 20\%. We then examine block-level dynamics when multiple transactions execute concurrently, revealing that moderate concurrency (e.g., 30–50 simultaneous transactions) can fill blocks to 80–90 of their gas limit and nearly double finalization times from around 15 seconds to over 30 seconds. Finally, we synthesize these insights into a practical design guide, demonstrating that flattening nested mappings, consolidating storage writes, and selectively timing high-impact transactions can markedly reduce costs and latency spikes. Collectively, our findings underscore the importance of EVM-specific optimizations and transaction scheduling for large-scale DApps in 6G telecom scenarios.
 
 
 
@@ -11,25 +11,18 @@ This paper presents a multi-contract blockchain framework for inter-provider agr
 
 ## Overview of Smart Contracts
 
-The proposed blockchain-based Decentralized Application (DApp) integrates smart contracts to facilitate inter-provider agreements, ensuring dynamic resource allocation while maintaining trust and enforcement mechanisms. These smart contracts operate in two main phases:
+- **RegistrationAD.sol**: Registers Administrative Domains (ADs) as either Providers or Consumers, establishing their role in the decentralized system.
 
-### **1. Preliminary Agreement Phase**
-This phase involves the initial service advertisement and selection process:
+- **AddService.sol**: Allows registered Providers to advertise their available services by recording service metadata (e.g., location, cost) on-chain.
 
-- **`AddService.sol`**:  
-  Allows providers to list their services on the marketplace. Each provider can register up to five services, with gas consumption varying from **162,500** units for the first service to **147,500** for subsequent services.
+- **SelectService.sol**: Enables Consumers to browse and select services offered by Providers, creating a binding service agreement.
 
-- **`SelectService.sol`**:  
-  Consumers use this contract to choose from available services. The gas consumption ranges between **138,752** and **155,992** units, depending on whether the service was previously selected (*cold vs. warm storage access*).
+- **RegisterBreach.sol**: Logs any breaches of service-level agreements (SLAs) by Providers based on performance data, typically fetched from off-chain sources.
 
-### **2. Enforcement Phase**
-This phase ensures compliance with service agreements and applies penalties for breaches:
+- **CalculatePenalty.sol**: Automatically computes monetary penalties for Providers who violate SLAs, using a predefined breach-to-penalty formula.
 
-- **`RegisterBreach.sol`**:  
-  Records contract breaches, with initial transactions consuming around **44,058** gas units, and subsequent executions requiring only **26,958** gas units.
+- **TransferFunds.sol**: Handles the final settlement by transferring Ether from Consumers to Providers or vice versa, based on service agreements or penalties.
 
-- **`CalculatePenalty.sol`**:  
-  Computes penalties based on breach records. The execution requires approximately **49,143** gas units.
 
 
 
@@ -103,6 +96,8 @@ This command deploys modules using Hardhat Ignition, a plugin for advanced deplo
 
 ## Conclusion
 
-This paper introduced a blockchain-based framework on the Ethereum live testnet to address the challenges of multi-phase inter-provider agreements in 6G contexts. By organizing our smart contracts into a *Preliminary Agreement Phase* (`addService`, `selectService`) and an *Enforcement Phase* (`registerBreach`, `calculatePenalty`), we measured both their gas usage and how blockchain parameters—gas price, block size, and transaction count—shape latency. Notably, our post-hoc analyses revealed that certain pairwise comparisons exhibited medium effect sizes in the *Preliminary Agreement Phase* when block size or transaction count spiked, suggesting that concurrency can overshadow fee-based prioritization more strongly than initially anticipated. Meanwhile, in the *Enforcement Phase*, multiple gas-price comparisons showed significant differences with a Cliff’s Delta up to 0.36, highlighting how lighter transaction logic makes fee bidding a more pivotal factor.
+In this work, we designed, implemented, and empirically evaluated a multi-contract DApp for inter-provider agreements on the Ethereum Sepolia testnet, providing detailed insights into gas consumption, transaction latency, and block-level resource utilization under realistic network conditions. Our experimentation revealed that repeated cold writes introduce a 15–20 increase in gas usage—crucially affecting large onboarding phases when new domains register en masse. Likewise, we observed that deep or nested data structures can impose a 5–10 overhead in gas costs per access, magnified when multiple participants act concurrently. As batch sizes rose, finalization times grew from baseline levels near 13–15 seconds to over 30 seconds or more, especially when block usage approached 80–90 of its gas limit.
 
-Such results underscore the potential benefits when designing and deploying smart contracts. For instance, minimizing heavy on-chain storage or batching it during off-peak times can alleviate block saturation, while adopting *adaptive fee policies* that incorporate real-time network load can help detect and react to concurrency surges. Applying *concurrency-aware scheduling* can further smooth latency spikes when multiple providers interact with the DApp. In more complex or high-throughput scenarios, additional measures such as EVM-level refactoring (e.g., reducing on-chain storage) or using Layer-2 solutions (e.g., Polygon or rollups) may mitigate latency and cost overheads. Future investigations could broaden the scope of on-chain metrics—beyond gas price, block size, and transaction count—to refine our understanding of how best to balance cost and throughput in beyond-5G decentralized environments.
+These findings affirm that gas and latency behavior hinge not just on per-function optimizations but also on concurrency management and network-level constraints. Even moderate concurrency waves can saturate blocks, defer some transactions to subsequent blocks, and inflate end-to-end settlement times. Consequently, our lessons learned emphasize (i) avoiding excessive cold writes by consolidating or batching initial state updates, (ii) flattening nested data layouts to reduce repeated lookups, and (iii) scheduling or throttling large transaction bursts so they do not overlap and worsen block congestion. Introducing dynamic fee adjustments for critical operations can further mitigate latencies under load.
+
+Overall, this study demonstrates how a careful interplay of smart-contract design, data-structure choices, and transaction timing can meaningfully improve performance in a multi-administrative 6G environment. By adopting the recommended practices—such as caching, zero-based enumerations, and off-peak scheduling—smart contract development can reduce gas overhead and latency, thereby enhancing the viability of on-chain resource sharing, SLA enforcement, and cross-domain coordination in next-generation telecom systems.
