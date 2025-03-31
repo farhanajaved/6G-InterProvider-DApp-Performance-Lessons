@@ -1,17 +1,9 @@
 
-# An Empirical Smart Contracts Latency Analysis on Ethereum Blockchain for Trustworthy Inter-Provider Agreements
+# Performance Analysis, Lessons Learned and Practical Advice for a 6G Inter-Provider DApp on the Ethereum Blockchain
 
 ## Abstract
 
-As 6G networks evolve, *inter-provider agreements* become crucial for dynamic resource sharing and network slicing across multiple domains, requiring on-demand capacity provisioning while enabling trustworthy interaction among diverse operators. To address these challenges, we propose a blockchain-based Decentralized Application (DApp) on Ethereum that introduces four smart contracts—organized into a *Preliminary Agreement Phase* and an *Enforcement Phase*—and measures their gas usage, thereby establishing an open marketplace where service providers can list, lease, and enforce resource sharing.
-
-We present an empirical evaluation of how gas price, block size, and transaction count affect transaction processing time on the live Sepolia Ethereum testnet in a realistic setting, focusing on these distinct smart-contract phases with varying computational complexities. We first examine transaction latency as the number of users (batch size) increases, observing median latencies from **12.5 s to 23.9 s** in the *Preliminary Agreement Phase* and **10.9 s to 24.7 s** in the *Enforcement Phase*.
-
-Building on these initial measurements, we perform a comprehensive Kruskal–Wallis test (*p < 0.001*) to compare latency distributions across quintiles of *gas price*, *block size*, and *transaction count*. The post-hoc analyses reveal that high-volume blocks overshadow fee variations when transaction logic is more complex (effect sizes up to **0.43**), whereas gas price exerts a stronger influence when the computation is lighter (effect sizes up to **0.36**). 
-
-Overall, **86%** of transactions finalize within **30 seconds**, underscoring that while designing decentralized applications, there must be a balance between contract complexity and fee strategies.  
-
-The implementation of this work is publicly accessible [online](https://github.com/farhanajaved/InP_DApp_Analysis.git).
+This paper presents a multi-contract blockchain framework for inter-provider agreements in 6G networks, emphasizing performance analysis under a realistic Proof-of-Stake (PoS) setting on Ethereum’s Sepolia testnet. We begin by quantifying Ethereum Virtual Machine (EVM)-based gas usage for critical operations such as provider registration, service addition, and SLA penalty enforcement, observing that cold writes and deep data structures can each inflate gas consumption by up to 20\%. We then examine block-level dynamics when multiple transactions execute concurrently, revealing that moderate concurrency (e.g., 30–50 simultaneous transactions) can fill blocks to 80–90\% of their gas limit and nearly double finalization times from around 15 seconds to over 30 seconds. Finally, we synthesize these insights into a practical design guide, demonstrating that flattening nested mappings, consolidating storage writes, and selectively timing high-impact transactions can markedly reduce costs and latency spikes. Collectively, our findings underscore the importance of EVM-specific optimizations and transaction scheduling for large-scale DApps in 6G telecom scenarios.
 
 
 
