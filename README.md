@@ -7,7 +7,7 @@ This paper presents a multi-contract blockchain framework for inter-provider agr
 
 
 
-![Proposed Framework for Blockchain and Federated Learning in O-RAN](Framework_InP_DApp.png)
+![Proposed Framework](Proposed_Framework.png)
 
 ## Overview of Smart Contracts
 
