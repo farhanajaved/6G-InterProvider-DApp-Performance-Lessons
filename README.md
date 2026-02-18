@@ -1,5 +1,6 @@
 
-# Performance Analysis, Lessons Learned and Practical Advice for a 6G Inter-Provider DApp on the Ethereum Blockchain
+# Performance Analysis and Practical Lessons for EVM-Based Inter-Provider DApps on the PoS Blockchain
+
 
 ## Abstract
 
