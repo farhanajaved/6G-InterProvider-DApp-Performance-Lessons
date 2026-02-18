@@ -7,7 +7,7 @@ This paper presents a multi-contract blockchain framework for inter-provider agr
 
 
 
-![Proposed Framework](Proposed_Work_Updated (2).png)
+![Proposed Framework](proposedwork.png)
 
 ## Overview of Smart Contracts
 
